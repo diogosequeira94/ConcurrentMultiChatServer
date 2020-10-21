@@ -28,37 +28,26 @@ public class Servidor extends Thread {
 
     @Override
     public void run() {
-
         try {
             ServerSocket serverSocket = new ServerSocket(port);
 
             //The accept method creates the connection between the server and the client
             while (true) {
-
-
                 System.out.println("Waiting to accept client connection...");
                 Socket clientSocket = serverSocket.accept();
                 workerID++;
-
                 System.out.println("Connection Established\n");
-
 
                 //We need to create another thread each time we have a client
                 ServerWorker serverWorker = new ServerWorker(this, clientSocket, workerID);
                 serverWorker.start();
 
-
                 //Each time we establish a connection we create a user, an that user must be stored in a array of Users or Connections
                 workerList.add(serverWorker);
-
             }
-
-
             //telnet localhost 8080 to check
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
