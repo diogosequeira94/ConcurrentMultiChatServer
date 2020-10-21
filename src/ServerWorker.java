@@ -24,7 +24,6 @@ public class ServerWorker extends Thread {
     @Override
     public void run() {
         try {
-
             //We will need the input name for the client
             outputStream = clientSocket.getOutputStream();
             String name = "\nWhat is your name?\n";
@@ -43,10 +42,8 @@ public class ServerWorker extends Thread {
     }
 
     private void clientHandler() throws IOException, InterruptedException {
-
         //OutputStream so the client can read
         this.outputStream = clientSocket.getOutputStream();
-
 
         //We also want an Input from the Client
         InputStream inputStream = clientSocket.getInputStream();
@@ -58,20 +55,14 @@ public class ServerWorker extends Thread {
         while((line = reader.readLine()) != null){
 
             String[] words = line.split(" ");
-
-            //Se o comando for Quit enviar mensagem
-
+            
             if("/quit".equalsIgnoreCase(line)){
 
                 for (ServerWorker worker : workerList) {
                     if(!worker.name.equalsIgnoreCase(name)){
                         worker.goodByeMessage(name);
-
                     }
                 }
-
-                break;
-
             } else if (words[0].startsWith("/alias")){
 
                 String currentName = this.name;
@@ -86,34 +77,23 @@ public class ServerWorker extends Thread {
                 for (ServerWorker worker : workerList) {
                     if(worker.name.equalsIgnoreCase(name)){
                         worker.printList();
-
                     }
                 }
-
             }
             //Iterar pelo array e dizer que todos os workers vao ver esta mensagem:
-
             for(ServerWorker worker : workerList){
                 if(!line.startsWith("/")){
-
                     if(!worker.name.equalsIgnoreCase(name) && !worker.clientSocket.isClosed()){
-
                         worker.sendMessage(line,name);
                     }
                 }
-
-
-
             }
 
         }
 
-
         System.out.println("Closing connection with " + name);
-        //We need to remove the Client from the array
         workerList.remove(this);
         clientSocket.close();
-
     }
 
     private void printList() throws IOException{
@@ -127,49 +107,27 @@ public class ServerWorker extends Thread {
 
         workers.insert(0, "List of Online users: \n");
         outputStream.write(workers.toString().getBytes());
-
-
-
     }
 
-
-        private void shoutNewName(String oldName, String newName) throws IOException{
-
+     private void shoutNewName(String oldName, String newName) throws IOException{
+      
             String shout = "*****" + oldName + " changed its name to " + newName + "*****\n";
-
             outputStream.write(shout.getBytes());
-
         }
 
 
-        private void setNewName(String newName) {
+    private void setNewName(String newName) {this.name = newName;}
 
-            this.name = newName;
-        }
+    private void goodByeMessage(String name) throws IOException{
+           String goodBye = "*****" + name + " has left the chat*****\n";
+           outputStream.write(goodBye.getBytes());
+    }
+   private void sendMessage(String message, String name) throws IOException {
 
-
-
-        private void goodByeMessage(String name) throws IOException{
-            String goodBye = "*****" + name + " has left the chat*****\n";
-
-            outputStream.write(goodBye.getBytes());
-
-        }
-
-
-        private void sendMessage(String message, String name) throws IOException {
-
-            String timeStamp = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
-
-            if(message != null){
-
-                message = timeStamp + " " + name + ": " + message + "\n";
-
+          String timeStamp = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+             if(message != null){
+                 message = timeStamp + " " + name + ": " + message + "\n";
                 outputStream.write(message.getBytes());
-
             }
-
-
         }
-
 }
